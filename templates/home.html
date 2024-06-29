@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}首页{% endblock %}
+{% block stylecontent %}
+<link href="static/css/styles.css" rel="stylesheet"/>
+{% endblock %}
+{% block content %}
+<div class="container-fluid px-4">
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active"></li>
+    </ol>
+    <div class="row">
+        <div class="col-xl-2 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">电影个数</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">{{ dataLen }}个</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">豆瓣最高评分</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">{{ maxRate }}分</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">出场最多演员</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">{{ maxCast }}</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-body">制片国家最多数</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">中国大陆</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">电影种类数</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">{{ typeLen }}种</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="card bg-dark text-white mb-4">
+                <div class="card-body">电影语言最多数</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="#">{{ maxLang }}</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-area me-1"></i>
+                    电影种类饼状图
+                </div>
+                <div class="card-body">
+                    <div id="mainOne" style="width: 100%;height: 400px"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    电影评分折线图
+                </div>
+                <div class="card-body">
+                    <div id="mainTwo" style="width: 100%;height: 400px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scriptcontent %}
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+<script src="static/js/scripts.js"></script>
+<script src="static/lib/sb-admin-2.min.js"></script>
+<script src="static/assets/demo/chart-area-demo.js"></script>
+<script src="static/assets/demo/chart-bar-demo.js"></script>
+<script src="static/js/table.js" crossorigin="anonymous"></script>
+<script src="static/js/datatables-simple-demo.js"></script>
+<script src="static/lib/echarts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+
+<script>
+    // 获取页面中ID为mainOne的标签元素，用于初始化图表
+    var chartDom = document.getElementById("mainOne");
+    console.log(chartDom);
+    var myChart = echarts.init(chartDom); // 使用ECharts初始化图表
+    var option;
+    option = {
+        // 标题
+        title: {
+            text: '电影种类饼状图',
+            left: 'center'
+        },
+        // 提示框
+        tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        // 图例
+        legend: {
+            orient: 'vertical', // 或 'horizontal'
+            left: 'left' // 或其他位置描述
+        },
+        // 系列列表
+        series: [
+            {
+                name: '电影种类个数',
+                type: 'pie',
+                radius: '50%',
+                data: JSON.parse('{{ types | tojson|safe }}'), // 假设服务端传递的数据是JSON字符串
+                // 选中的状态样式
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    option && myChart.setOption(option);
+</script>
+
+<script>
+    var chartDom = document.getElementById("mainTwo");
+    console.log(chartDom);
+    var myChart = echarts.init(chartDom); // 使用ECharts初始化图表
+    var option;
+    option = {
+        title: {
+            text: '电影评分折线图'
+        },
+        tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'cross',
+          label: {
+            backgroundColor: '#6a7985'
+          }
+        }
+  },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+        // toolbox: {
+        // feature: {
+        //   saveAsImage: {}
+        // }
+  // },
+        xAxis: {
+            type: 'category',
+            boundaryGap: true,
+            data: {{ row | tojson|safe }} // 假设服务端传递的数据是JSON格式
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                type: 'line',
+                itemStyle: {
+                color: 'rgb(255, 70, 131)'
+              },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {
+                offset: 0,
+                color: 'rgb(255, 158, 68)'
+              },
+              {
+                offset: 1,
+                color: 'rgb(255, 70, 131)'
+              }
+        ])
+      },
+                data: {{ column | tojson|safe }} // 假设服务端传递的数据是JSON格式
+            }
+        ]
+    };
+    option && myChart.setOption(option);
+</script>
+
+
+{% endblock %}
